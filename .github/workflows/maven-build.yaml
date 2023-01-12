@@ -19,9 +19,9 @@ jobs:
       matrix:
         include:
           - image: ${{ github.repository }}-jvm-maven
-            build: ./mvnw package -Dpackaging=docker -Djib.to.image=${{ github.repository }}-jvm-maven
+            build: ./mvnw package -Dpackaging=docker -Djib.to.image=${{ env.REGISTRY }}/${{ github.repository }}-jvm-maven
           - image: ${{ github.repository }}-native-maven
-            build: ./mvnw package -Dpackaging=docker-native -Pgraalvm -Djib.to.image=${{ github.repository }}-native-maven
+            build: ./mvnw package -Dpackaging=docker-native -Pgraalvm -Djib.to.image=${{ env.REGISTRY }}/${{ github.repository }}-native-maven
     permissions:
       contents: read
       packages: write
@@ -52,4 +52,4 @@ jobs:
 
       - name: Push image
         run: |
-          docker push ${{ matrix.image }}
+          docker push ${{ env.REGISTRY }}/${{ matrix.image }}
