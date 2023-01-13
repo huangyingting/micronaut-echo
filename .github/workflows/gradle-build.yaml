@@ -21,11 +21,13 @@ jobs:
           - image: ${{ github.repository }}-native-gradle
             file: build/docker/native-main/DockerfileNative
             context: build/docker/native-main
-            generate: ./gradlew buildNativeLayers
+            build-layers: ./gradlew buildNativeLayers
+            generate-dockerfile: ./gradlew dockerfileNative
           - image: ${{ github.repository }}-jvm-gradle
             file: build/docker/main/Dockerfile
             context: build/docker/main
-            generate: ./gradlew buildLayers
+            build-layers: ./gradlew buildLayers
+            generate-dockerfile: ./gradlew dockerfile
     permissions:
       contents: read
       packages: write
@@ -48,11 +50,14 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Prepare application configuration
-        run: ./gradlew dockerPrepareContext
+      - name: Builder docker layers
+        run: ${{ matrix.build-layers }}
 
       - name: Generate dockerfile
-        run: ${{ matrix.generate }}
+        run: ${{ matrix.generate-dockerfile }}
+
+      - name: Prepare application configuration
+        run: ./gradlew dockerPrepareContext
 
       - name: Extract metadata (tags, labels)
         id: meta
